@@ -555,7 +555,10 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
   border-radius: 8px;
   padding: 8px 10px;
   animation: traySlideIn 0.22s ease;
+  cursor: pointer;
+  transition: border-color 0.15s;
 }
+.tray-item:hover { border-color: var(--border2); }
 @keyframes traySlideIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -1556,6 +1559,8 @@ async function loadExercises() {
       from += pageSize;
     }
     exercises = all;
+    // Randomize default order on every load for fresh discovery
+    exercises = exercises.sort(() => Math.random() - 0.5);
     buildMusclePills('all');
     // Load favorites in parallel, then render once both are done
     await loadFavorites();
@@ -1814,6 +1819,23 @@ function muscleDiagramSVG(primaryMuscle) {
 
 
 
+// Build 2x2 stat grid for expanded card detail
+function buildStatGrid(ex) {
+  const equipDisplay = ex.e && ex.e !== 'BW' ? ex.e : 'Bodyweight';
+  const cells = [
+    { label: 'Primary Muscle', value: ex.m || null, pos: 'tl' },
+    { label: 'Secondary Muscle', value: ex.s || null, pos: 'tr' },
+    { label: 'Equipment', value: equipDisplay, pos: 'bl' },
+    { label: 'Movement Pattern', value: ex.mv || null, pos: 'br' },
+  ].filter(c => c.value);
+
+  // If we only have 1 or 2 items, make them full width
+  const isWide = cells.length <= 2;
+  return cells.map(c =>
+    `<div class="detail-item${isWide ? ' full' : ''}"><label>${c.label}</label><p>${c.value}</p></div>`
+  ).join('');
+}
+
 function renderCard(ex) {
   const color = MUSCLE_COLORS[ex.m] || '#888';
   const diffClass = (ex.d||'').toLowerCase().replace(' ','');
@@ -1841,10 +1863,7 @@ function renderCard(ex) {
   } else if (isExpanded) {
     detailHtml = `<div class="ex-detail">
       <div class="detail-grid">
-        <div class="detail-item"><label>Primary Muscle</label><p>${ex.m||'—'}</p></div>
-        <div class="detail-item"><label>Equipment</label><p>${equipDisplay}</p></div>
-        ${ex.s?`<div class="detail-item"><label>Secondary Muscle</label><p>${ex.s}</p></div>`:''}
-        ${ex.mv?`<div class="detail-item"><label>Movement Pattern</label><p>${ex.mv}</p></div>`:''}
+        ${buildStatGrid(ex)}
         ${ex.c?`<div class="detail-item full"><label>Classification</label><p>${ex.c}</p></div>`:''}
         ${muscleDiagramSVG(ex.m)}
       </div>
@@ -2031,8 +2050,9 @@ let wheelSpinning = false;
 let wheelAnimFrame = null;
 
 function openWheel() {
-  // Pool: Core exercises only
-  wheelPool = exercises.filter(e => e.m === 'Core');
+  // Pool: Core exercises only, capped at Advanced difficulty
+  const allowedDiffs = ['Novice', 'Beginner', 'Intermediate', 'Advanced'];
+  wheelPool = exercises.filter(e => e.m === 'Core' && allowedDiffs.includes(e.d));
   if (wheelPool.length === 0) { showToast('No Core exercises found!'); return; }
 
   wheelPickedEx = null;
@@ -2164,11 +2184,25 @@ function wheelGo() {
   if (!wheelPickedEx) return;
   closeWheel();
 
-  // Ensure the exercise is visible in the list (reset filters minimally)
-  // Just make sure displayCount is large enough
+  // Clear all filters so the exercise is guaranteed to be visible
+  currentRegion = 'all';
+  currentMuscle = 'all';
+  currentDiff = 'all';
+  currentSearch = '';
+  showFavoritesOnly = false;
+  document.getElementById('searchInput').value = '';
+  document.querySelectorAll('#regionRow .pill').forEach((p,i) => p.classList.toggle('active', i===0));
+  document.querySelectorAll('#diffRow .pill').forEach((p,i) => p.classList.toggle('active', i===0));
+  document.getElementById('favPill').classList.remove('active');
+  buildMusclePills('all');
+  updateFilterToggleState();
+
+  // Make sure displayCount is large enough to show this exercise
   const idx = exercises.findIndex(e => e.id === wheelPickedEx.id);
   if (idx >= 0) displayCount = Math.max(displayCount, idx + 1);
 
+  // Expand the card
+  expandedId = wheelPickedEx.id;
   render();
 
   // Scroll to card and apply glow highlight
@@ -2229,12 +2263,38 @@ function updateSessionTray() {
   tray.classList.toggle('visible', sessionList.length > 0);
 
   list.innerHTML = sessionList.map((s, i) => `
-    <div class="tray-item" id="tray-item-${s.id}">
+    <div class="tray-item" id="tray-item-${s.id}" onclick="goToExerciseFromTray(${s.id})">
       <span class="tray-item-num">${String(i + 1).padStart(2, '0')}</span>
       <span class="tray-item-name">${s.name}</span>
-      <button class="tray-item-remove" onclick="removeFromSession(${s.id})" title="Remove">×</button>
+      <button class="tray-item-remove" onclick="event.stopPropagation();removeFromSession(${s.id})" title="Remove">×</button>
     </div>
   `).join('');
+}
+
+function goToExerciseFromTray(exerciseId) {
+  // Clear filters so exercise is guaranteed visible
+  currentRegion = 'all';
+  currentMuscle = 'all';
+  currentDiff = 'all';
+  currentSearch = '';
+  showFavoritesOnly = false;
+  document.getElementById('searchInput').value = '';
+  document.querySelectorAll('#regionRow .pill').forEach((p,i) => p.classList.toggle('active', i===0));
+  document.querySelectorAll('#diffRow .pill').forEach((p,i) => p.classList.toggle('active', i===0));
+  document.getElementById('favPill').classList.remove('active');
+  buildMusclePills('all');
+  updateFilterToggleState();
+
+  const idx = exercises.findIndex(e => e.id === exerciseId);
+  if (idx >= 0) displayCount = Math.max(displayCount, idx + 1);
+
+  expandedId = exerciseId;
+  render();
+
+  setTimeout(() => {
+    const card = document.getElementById('card-' + exerciseId);
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 80);
 }
 
 function removeFromSession(exerciseId) {
