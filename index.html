@@ -279,6 +279,7 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
 .detail-item label { font-family: 'Space Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); display: block; margin-bottom: 3px; }
 .detail-item p { font-size: 13px; font-weight: 600; color: var(--text); }
 .detail-item.full { grid-column: 1 / -1; }
+.detail-item-empty { visibility: hidden; }
 .video-btn { margin-top: 12px; display: flex; align-items: center; gap: 8px; background: #ff0000; color: white; padding: 10px 16px; border-radius: 8px; font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; cursor: pointer; border: none; width: 100%; justify-content: center; text-decoration: none; transition: background 0.15s; }
 .video-btn:hover { background: #cc0000; }
 .no-video { margin-top: 10px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
@@ -543,7 +544,9 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
   gap: 5px;
   max-height: 200px;
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 .tray-list::-webkit-scrollbar { display: none; }
 .tray-item {
@@ -557,8 +560,12 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
   animation: traySlideIn 0.22s ease;
   cursor: pointer;
   transition: border-color 0.15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(255,255,255,0.05);
+  user-select: none;
 }
 .tray-item:hover { border-color: var(--border2); }
+.tray-item:active { background: var(--surface2); }
 @keyframes traySlideIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -1819,20 +1826,21 @@ function muscleDiagramSVG(primaryMuscle) {
 
 
 
-// Build 2x2 stat grid for expanded card detail
+// Build strict 2x2 stat grid for expanded card detail
+// Top row: Primary Muscle | Secondary Muscle
+// Bottom row: Equipment | Movement Pattern
+// Empty cells hidden entirely
 function buildStatGrid(ex) {
   const equipDisplay = ex.e && ex.e !== 'BW' ? ex.e : 'Bodyweight';
   const cells = [
-    { label: 'Primary Muscle', value: ex.m || null, pos: 'tl' },
-    { label: 'Secondary Muscle', value: ex.s || null, pos: 'tr' },
-    { label: 'Equipment', value: equipDisplay, pos: 'bl' },
-    { label: 'Movement Pattern', value: ex.mv || null, pos: 'br' },
-  ].filter(c => c.value);
-
-  // If we only have 1 or 2 items, make them full width
-  const isWide = cells.length <= 2;
-  return cells.map(c =>
-    `<div class="detail-item${isWide ? ' full' : ''}"><label>${c.label}</label><p>${c.value}</p></div>`
+    { label: 'Primary Muscle', value: ex.m || null },
+    { label: 'Secondary Muscle', value: ex.s || null },
+    { label: 'Equipment', value: equipDisplay || null },
+    { label: 'Movement Pattern', value: ex.mv || null },
+  ];
+  return cells.map(c => c.value
+    ? `<div class="detail-item"><label>${c.label}</label><p>${c.value}</p></div>`
+    : `<div class="detail-item detail-item-empty"></div>`
   ).join('');
 }
 
@@ -1864,7 +1872,6 @@ function renderCard(ex) {
     detailHtml = `<div class="ex-detail">
       <div class="detail-grid">
         ${buildStatGrid(ex)}
-        ${ex.c?`<div class="detail-item full"><label>Classification</label><p>${ex.c}</p></div>`:''}
         ${muscleDiagramSVG(ex.m)}
       </div>
       ${ex.v
@@ -2182,6 +2189,7 @@ function onWheelLanded() {
 
 function wheelGo() {
   if (!wheelPickedEx) return;
+  const targetId = wheelPickedEx.id;
   closeWheel();
 
   // Clear all filters so the exercise is guaranteed to be visible
@@ -2197,23 +2205,25 @@ function wheelGo() {
   buildMusclePills('all');
   updateFilterToggleState();
 
-  // Make sure displayCount is large enough to show this exercise
-  const idx = exercises.findIndex(e => e.id === wheelPickedEx.id);
-  if (idx >= 0) displayCount = Math.max(displayCount, idx + 1);
-
   // Expand the card
-  expandedId = wheelPickedEx.id;
+  expandedId = targetId;
+
+  // Find position in filtered list (respects randomized order) and ensure it's rendered
+  const filtered = getFiltered();
+  const posInFiltered = filtered.findIndex(e => e.id === targetId);
+  if (posInFiltered >= 0) displayCount = Math.max(displayCount, posInFiltered + 1);
+
   render();
 
   // Scroll to card and apply glow highlight
   setTimeout(() => {
-    const card = document.getElementById('card-' + wheelPickedEx.id);
+    const card = document.getElementById('card-' + targetId);
     if (card) {
       card.scrollIntoView({ behavior: 'smooth', block: 'center' });
       card.classList.add('wheel-highlight');
       card.addEventListener('animationend', () => card.classList.remove('wheel-highlight'), { once: true });
     }
-  }, 80);
+  }, 120);
 }
 
 function wheelSpinAgain() {
@@ -2285,16 +2295,18 @@ function goToExerciseFromTray(exerciseId) {
   buildMusclePills('all');
   updateFilterToggleState();
 
-  const idx = exercises.findIndex(e => e.id === exerciseId);
-  if (idx >= 0) displayCount = Math.max(displayCount, idx + 1);
-
   expandedId = exerciseId;
+
+  const filtered = getFiltered();
+  const posInFiltered = filtered.findIndex(e => e.id === exerciseId);
+  if (posInFiltered >= 0) displayCount = Math.max(displayCount, posInFiltered + 1);
+
   render();
 
   setTimeout(() => {
     const card = document.getElementById('card-' + exerciseId);
     if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 80);
+  }, 120);
 }
 
 function removeFromSession(exerciseId) {
