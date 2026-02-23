@@ -793,24 +793,7 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
   color: var(--text);
   margin-bottom: 8px;
 }
-.center-node .cn-tags {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-.center-node .cn-tag {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(255,255,255,0.05);
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.center-node .cn-tag.diff-tag { color: inherit; }
+
 .center-node .cn-actions {
   display: flex;
   gap: 6px;
@@ -863,20 +846,19 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
 .satellite-node:nth-child(7) { animation-delay: 0.3s; }
 
 .sat-inner {
-  width: 120px;
-  min-height: 72px;
-  height: auto;
+  width: 110px;
+  height: 84px;
   background: #0d0d0d;
   border: 1px solid #1e1e1e;
   border-radius: 10px;
-  padding: 10px 10px 8px;
+  padding: 9px 9px 7px;
   text-align: center;
   transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
 }
 .sat-inner:hover {
   border-color: #2e2e2e;
@@ -903,8 +885,22 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
   font-weight: 700;
   line-height: 1.3;
   color: #ccc;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-
+.sat-inner .sat-diff {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  margin-top: 2px;
+  color: #444;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 
 /* EMPTY SATELLITE PLACEHOLDER */
 .sat-empty .sat-inner {
@@ -913,32 +909,6 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
 }
 .sat-empty .sat-name { color: #333; font-style: italic; font-size: 10px; }
 
-/* LEGEND BAR */
-.explorer-legend {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  padding: 10px 16px;
-  border-top: 1px solid #111;
-  flex-shrink: 0;
-  background: #050505;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #333;
-}
-.legend-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
 
 /* EXPLORER SEARCH DROPDOWN */
 .explorer-dropdown {
@@ -1394,21 +1364,7 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
     <div id="explorerNodes"></div>
   </div>
 
-  <div class="explorer-legend" style="flex-direction:column;gap:7px;">
-    <div style="display:flex;align-items:center;gap:8px;opacity:0.2;width:100%;max-width:300px;margin:0 auto;">
-      <span style="font-family:'Space Mono',monospace;font-size:8px;color:#aaa;text-transform:uppercase;letter-spacing:0.1em;white-space:nowrap;">easier</span>
-      <div style="flex:1;height:1px;background:linear-gradient(to right,#5a9e82,#555,#00BFFF);position:relative;">
-        <span style="position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:9px;color:#aaa;">&#9666;</span>
-        <span style="position:absolute;right:0;top:50%;transform:translateY(-50%);font-size:9px;color:#aaa;">&#9656;</span>
-      </div>
-      <span style="font-family:'Space Mono',monospace;font-size:8px;color:#aaa;text-transform:uppercase;letter-spacing:0.1em;white-space:nowrap;">harder</span>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:20px;">
-      <div class="legend-item"><div class="legend-dot" style="background:#5a9e82"></div>Regression</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#00BFFF"></div>Progression</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#FFD700"></div>Variation</div>
-    </div>
-  </div>
+
 </div>
 
 <!-- WHEEL OF GAINS OVERLAY -->
@@ -1876,10 +1832,7 @@ function renderCard(ex) {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
             Watch on YouTube
            </a>`
-        : `<a class="video-btn" href="https://www.youtube.com/results?search_query=how+to+${encodeURIComponent(ex.n||'')}" target="_blank" rel="noopener" style="background:#1c1c1c;border:1px solid #2a2a2a;color:#666;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            Search YouTube for form guide
-           </a>`}
+        : `<div class="no-video">No video available</div>`}
     </div>`;
   }
   return `<div class="ex-card${isExpanded?' expanded':''}${editModeActive?' edit-mode-card':''}" id="card-${ex.id}" onclick="toggleCard(${ex.id})">
@@ -2459,15 +2412,17 @@ function renderExplorer() {
 
   const isMobile = W < 500;
 
-  // Scale gaps relative to canvas size so it fills the space on any screen
-  const scale = Math.min(W, H) / 600;
-  const CENTER_H = 170;
-  const SAT_H    = 90;
-  const SAT_W    = 120;
+  // Node pixel dimensions (must match CSS exactly)
+  const CENTER_H = isMobile ? 150 : 170; // approximate center node height
+  const SAT_H    = isMobile ? 76  : 84;  // satellite node height (fixed in CSS)
+  const SAT_W    = isMobile ? 96  : 110;
 
-  const vGap   = Math.round((CENTER_H / 2 + 40 + SAT_H / 2) * Math.max(scale, 0.85));
-  const hGap   = Math.round((SAT_W / 2 + 120) * Math.max(scale, 0.85));
-  const hSpread = Math.round((SAT_W + 24) * Math.max(scale, 0.85));
+  // Gap = half center height + padding + half sat height
+  const vGap = Math.floor(CENTER_H / 2) + 28 + Math.floor(SAT_H / 2);
+  // Horizontal gap for variations (edge-to-edge clearance from center)
+  const hGap = Math.floor(SAT_W / 2) + (isMobile ? 80 : 100);
+  // Horizontal spread when 2 regressions/progressions side by side
+  const hSpread = SAT_W + (isMobile ? 12 : 16);
 
   const positions = [];
 
@@ -2508,10 +2463,7 @@ function renderExplorer() {
   html += `<div class="explorer-node center-node" style="left:${cx}px;top:${cy}px" onclick="explorerOpenCenter(${ex.id})">
     <div class="cn-accent-bar" style="background:${muscleColor}"></div>
     <div class="cn-name">${ex.n || 'Unnamed'}</div>
-    <div class="cn-tags">
-      <span class="cn-tag">${ex.m || '—'}</span>
-      <span class="cn-tag diff-tag tag-diff ${diffClass}">${(ex.d || '—').toUpperCase()}</span>
-    </div>
+
     <div class="cn-actions">
       <button class="cn-btn add-btn${inSession ? ' in-session' : ''}" onclick="event.stopPropagation();explorerToggleSession(${ex.id},event)">
         ${inSession ? '✓ Added' : '+ Session'}
@@ -2531,6 +2483,7 @@ function renderExplorer() {
       <div class="sat-inner">
         <div class="sat-type-label">${type}</div>
         <div class="sat-name">${sat.n || 'Unnamed'}</div>
+        <div class="sat-diff tag-diff ${satDiffClass}">${(sat.d || '—').toUpperCase()}</div>
       </div>
     </div>`;
   });
