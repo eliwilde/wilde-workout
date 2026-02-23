@@ -1447,6 +1447,12 @@ const MUSCLE_COLORS = {
 };
 const DIFF_ORDER = ['Novice','Beginner','Intermediate','Advanced','Expert','Master','Legendary','Grand Master'];
 const MUSCLES_LIST = ['Ankles/Feet','Back','Biceps','Calves','Chest','Core','Forearms','Glutes','Hamstrings','Hips','Quads','Shoulders','Traps','Triceps'];
+// Maps display pill names to the actual database values they should match
+const MUSCLE_GROUPS = {
+  'Hips':        ['Hips','Hip Flexors','Abductors','Adductors'],
+  'Ankles/Feet': ['Ankles/Feet','Shins'],
+  'Traps':       ['Traps','Trapezius'],
+};
 const DIFFS_LIST = ['Novice','Beginner','Intermediate','Advanced','Expert','Master','Legendary','Grand Master'];
 
 async function sbFetch(path, opts={}) {
@@ -1665,7 +1671,7 @@ function getFiltered() {
   let list = exercises;
   if (showFavoritesOnly) list = list.filter(e => favoriteIds.has(e.id));
   if (currentRegion !== 'all') list = list.filter(e => MUSCLE_REGIONS[currentRegion]?.includes(e.m));
-  if (currentMuscle !== 'all') list = list.filter(e => e.m === currentMuscle);
+  if (currentMuscle !== 'all') { const group = MUSCLE_GROUPS[currentMuscle] || [currentMuscle]; list = list.filter(e => group.includes(e.m)); }
   if (currentDiff !== 'all') list = list.filter(e => e.d === currentDiff);
   if (currentSearch) list = list.filter(e =>
     (e.n||'').toLowerCase().includes(currentSearch) ||
