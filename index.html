@@ -1270,13 +1270,7 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
 
 <div id="filterDrawer">
   <div class="filter-section">
-    <div class="filter-label">Region</div>
-    <div class="filter-row" id="regionRow">
-      <div class="pill active" onclick="setRegion('all',this)">All</div>
-      <div class="pill region-upper" onclick="setRegion('upper',this)">Upper Body</div>
-      <div class="pill region-core" onclick="setRegion('core',this)">Core</div>
-      <div class="pill region-lower" onclick="setRegion('lower',this)">Lower Body</div>
-    </div>
+
     <div class="filter-label">Muscle</div>
     <div class="filter-row" id="muscleRow"></div>
     <div class="filter-label">Difficulty</div>
@@ -1288,16 +1282,14 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
       <div class="pill diff-advanced" onclick="setDiff('Advanced',this)">Advanced</div>
       <div class="pill diff-expert" onclick="setDiff('Expert',this)">Expert</div>
       <div class="pill diff-master" onclick="setDiff('Master',this)">Master</div>
-    </div>
-    <div class="filter-label">Saved</div>
-    <div class="filter-row" id="favRow">
       <div class="pill fav-pill" id="favPill" onclick="toggleFavFilter(this)">
         <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
         </svg>
-        Favorites
+        Saved
       </div>
     </div>
+
   </div>
 </div>
 
@@ -1448,13 +1440,13 @@ const MUSCLE_REGIONS = {
   lower: ['Quads','Hamstrings','Glutes','Calves','Hip Flexors','Abductors','Adductors','Shins'],
 };
 const MUSCLE_COLORS = {
-  Chest:'#60a5fa', Back:'#3b82f6', Shoulders:'#93c5fd', Trapezius:'#7dd3fc',
+  Chest:'#60a5fa', Back:'#3b82f6', Shoulders:'#93c5fd', Traps:'#7dd3fc',
   Biceps:'#a5b4fc', Triceps:'#818cf8', Forearms:'#c4b5fd', Core:'#34d399',
   Quads:'#f472b6', Hamstrings:'#fb7185', Glutes:'#f43f5e', Calves:'#fda4af',
-  'Hip Flexors':'#fb923c', Abductors:'#fbbf24', Adductors:'#f59e0b', Shins:'#facc15',
+  Hips:'#fb923c', 'Ankles/Feet':'#facc15',
 };
 const DIFF_ORDER = ['Novice','Beginner','Intermediate','Advanced','Expert','Master','Legendary','Grand Master'];
-const MUSCLES_LIST = ['Abductors','Adductors','Back','Biceps','Calves','Chest','Core','Forearms','Glutes','Hamstrings','Hip Flexors','Quads','Shins','Shoulders','Trapezius','Triceps'];
+const MUSCLES_LIST = ['Ankles/Feet','Back','Biceps','Calves','Chest','Core','Forearms','Glutes','Hamstrings','Hips','Quads','Shoulders','Traps','Triceps'];
 const DIFFS_LIST = ['Novice','Beginner','Intermediate','Advanced','Expert','Master','Legendary','Grand Master'];
 
 async function sbFetch(path, opts={}) {
