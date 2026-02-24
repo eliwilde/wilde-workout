@@ -25,33 +25,33 @@ function getExplorerNeighbors(ex) {
 
 function renderExplorer() {
   const ex = exercises.find(e => e.id === explorerActiveId);
+  if (!ex) return;
   const { regressions, progressions, variations } = getExplorerNeighbors(ex);
+
+  // Only include satellites that actually exist
   const allSats = [
     ...regressions.map(e => ({ ex: e, type: 'regression' })),
     ...progressions.map(e => ({ ex: e, type: 'progression' })),
     ...variations.map(e => ({ ex: e, type: 'variation' }))
-  ];
-  
+  ].filter(item => item.ex);
+
   const canvas = document.getElementById('explorerCanvas');
   const cx = canvas.offsetWidth / 2;
   const cy = canvas.offsetHeight / 2;
 
-  // Radius scales so nodes never overlap: each node is ~120px wide, 
-  // so circumference needs to be at least nodeCount * 130px
-  const minRadius = canvas.offsetWidth < 500 ? 150 : 200;
   const nodeCount = allSats.length;
-  // Make sure there's enough arc between nodes (each needs ~130px of arc space)
-  const radiusFromNodeCount = nodeCount > 0 ? (nodeCount * 130) / (2 * Math.PI) : minRadius;
-  const radius = Math.max(minRadius, radiusFromNodeCount);
+  const minRadius = canvas.offsetWidth < 500 ? 150 : 200;
+  const radiusFromCount = nodeCount > 0 ? (nodeCount * 130) / (2 * Math.PI) : minRadius;
+  const radius = Math.max(minRadius, radiusFromCount);
 
-  // Even ring: divide full circle equally among satellites
   const positions = allSats.map((item, i) => {
     const angle = (2 * Math.PI * i) / nodeCount - Math.PI / 2;
     return { ex: item.ex, type: item.type, x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
   });
 
-  document.getElementById('explorerLines').innerHTML = positions.map(p => 
-    `<line class="explorer-line ${p.type}" x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" />`).join('');
+  document.getElementById('explorerLines').innerHTML = positions.map(p =>
+    `<line class="explorer-line ${p.type}" x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" />`
+  ).join('');
 
   document.getElementById('explorerNodes').innerHTML = `
     <div class="explorer-node center-node" style="left:${cx}px;top:${cy}px">
@@ -59,7 +59,6 @@ function renderExplorer() {
     </div>` + positions.map(p => `
     <div class="explorer-node" style="left:${p.x}px;top:${p.y}px" onclick="navigateExplorer(${p.ex.id})">
       <div class="sat-inner">
-        <div class="sat-type-label">${p.type}</div>
         <div class="sat-name">${p.ex.n}</div>
       </div>
     </div>`).join('');
