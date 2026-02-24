@@ -8,7 +8,7 @@ const DIFF_ORDER = ['Novice','Beginner','Intermediate','Advanced','Expert','Mast
 const MUSCLE_COLORS = { Chest:'#60a5fa', Back:'#3b82f6', Shoulders:'#93c5fd', Traps:'#7dd3fc', Biceps:'#a5b4fc', Triceps:'#818cf8', Forearms:'#c4b5fd', Core:'#34d399', Quads:'#f472b6', Hamstrings:'#fb7185', Glutes:'#f43f5e', Calves:'#fda4af' };
 
 async function loadExercises() {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/exercises?select=*`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/exercises?select=*&limit=5000`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
   exercises = await res.json();
   render();
 }
