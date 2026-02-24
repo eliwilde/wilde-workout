@@ -14,9 +14,11 @@ async function loadExercises() {
 }
 
 function getExplorerNeighbors(ex) {
-  const sameMuscle = exercises.filter(e => e.m === ex.m && e.id !== ex.id && e.n !== ex.n); // FIX: Filters out self-names
+  // Filter out any exercise with the exact same name OR same id as center
+  const sameMuscle = exercises.filter(e => e.m === ex.m && e.id !== ex.id && e.n !== ex.n);
   const regressions = sameMuscle.filter(e => DIFF_ORDER.indexOf(e.d) < DIFF_ORDER.indexOf(ex.d)).slice(0, 2);
   const progressions = sameMuscle.filter(e => DIFF_ORDER.indexOf(e.d) > DIFF_ORDER.indexOf(ex.d)).slice(0, 2);
+  // Also exclude same name in variations
   const variations = exercises.filter(e => e.id !== ex.id && e.n !== ex.n && e.n.includes(ex.n.split(' ')[0])).slice(0, 3);
   return { regressions, progressions, variations };
 }
@@ -31,12 +33,20 @@ function renderExplorer() {
   ];
   
   const canvas = document.getElementById('explorerCanvas');
-  const cx = canvas.offsetWidth / 2, cy = canvas.offsetHeight / 2;
-  const radius = canvas.offsetWidth < 500 ? 120 : 160;
+  const cx = canvas.offsetWidth / 2;
+  const cy = canvas.offsetHeight / 2;
 
-  // ORBITAL LAYOUT FIX: Nodes fan out in a circle
+  // Radius scales so nodes never overlap: each node is ~120px wide, 
+  // so circumference needs to be at least nodeCount * 130px
+  const minRadius = canvas.offsetWidth < 500 ? 150 : 200;
+  const nodeCount = allSats.length;
+  // Make sure there's enough arc between nodes (each needs ~130px of arc space)
+  const radiusFromNodeCount = nodeCount > 0 ? (nodeCount * 130) / (2 * Math.PI) : minRadius;
+  const radius = Math.max(minRadius, radiusFromNodeCount);
+
+  // Even ring: divide full circle equally among satellites
   const positions = allSats.map((item, i) => {
-    const angle = (2 * Math.PI * i) / allSats.length - Math.PI / 2;
+    const angle = (2 * Math.PI * i) / nodeCount - Math.PI / 2;
     return { ex: item.ex, type: item.type, x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
   });
 
