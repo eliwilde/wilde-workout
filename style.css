@@ -157,7 +157,7 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
   pointer-events: none;
 }
 
-/* Fix 4: Lines — stroke-width 2, subtle dashed style */
+/* Lines — stroke-width 2, subtle dashed */
 .explorer-line {
   stroke: #2a2a2a;
   stroke-width: 2;
@@ -165,10 +165,9 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
   stroke-dasharray: 4 8;
   opacity: 1;
 }
-/* Subtle color tint per line type */
-.explorer-line.regression  { stroke: #3b82f6; opacity: 0.35; }
-.explorer-line.progression { stroke: #4ade80; opacity: 0.35; }
-.explorer-line.variation   { stroke: #888;    opacity: 0.25; }
+.explorer-line.regression  { stroke: #3b82f6; opacity: 0.4; }
+.explorer-line.progression { stroke: #4ade80; opacity: 0.4; }
+.explorer-line.variation   { stroke: #888;    opacity: 0.3; }
 
 /* NODES */
 .explorer-node {
@@ -186,7 +185,7 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
   border-radius: 14px;
   padding: 14px 12px;
   text-align: center;
-  pointer-events: none; /* center is not clickable */
+  pointer-events: none;
 }
 .cn-muscle {
   font-family: 'Space Mono', monospace;
@@ -212,7 +211,8 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
   border-radius: 999px;
   font-weight: 700;
 }
-/* Difficulty badge colors on center node */
+
+/* Difficulty badge colors */
 .diff-badge-novice       { background: #4ade8022; color: #4ade80; border: 1px solid #4ade8044; }
 .diff-badge-beginner     { background: #a3e63522; color: #a3e635; border: 1px solid #a3e63544; }
 .diff-badge-intermediate { background: #facc1522; color: #facc15; border: 1px solid #facc1544; }
@@ -221,11 +221,8 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
 .diff-badge-master       { background: #e879f922; color: #e879f9; border: 1px solid #e879f944; }
 
 /* SATELLITE NODES */
-.sat-node { }
-
 .sat-inner {
-  /* Fix 3: wider box, no line-clamp, font can wrap naturally */
-  width: 110px;
+  width: 115px;
   background: #0d0d0d;
   border: 1px solid #252525;
   border-radius: 10px;
@@ -236,16 +233,15 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
   align-items: center;
   justify-content: center;
   gap: 4px;
-  /* Fix 4: smooth glow transition */
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Fix 4: Neon glow on hover — accent yellow */
+/* Neon glow on hover */
 .sat-inner:hover {
   border-color: var(--accent);
   box-shadow:
-    0 0 8px rgba(232, 255, 71, 0.3),
-    0 0 20px rgba(232, 255, 71, 0.1);
+    0 0 8px rgba(232, 255, 71, 0.35),
+    0 0 22px rgba(232, 255, 71, 0.12);
 }
 
 /* Subtle left-border color per type */
@@ -256,16 +252,14 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
 .sat-type-label {
   font-family: 'Space Mono', monospace;
   font-size: 8px;
-  color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
-/* Color the type label per type */
 .sat-regression  .sat-type-label { color: #3b82f6; }
 .sat-progression .sat-type-label { color: #4ade80; }
 .sat-variation   .sat-type-label { color: var(--muted2); }
 
-/* Fix 3: No clamp. Font is small enough to wrap cleanly. */
+/* Full name — no truncation, wraps naturally */
 .sat-name {
   font-family: 'Syne', sans-serif;
   font-size: 11px;
@@ -273,7 +267,6 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
   color: #ccc;
   line-height: 1.35;
   word-break: break-word;
-  /* Intentionally NO overflow hidden, NO line-clamp, NO white-space nowrap */
 }
 
 /* LIST */
