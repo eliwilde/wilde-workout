@@ -14,24 +14,23 @@ async function loadExercises() {
 }
 
 function getExplorerNeighbors(ex) {
-  const sameMuscle = exercises.filter(e => e.m === ex.m && e.id !== ex.id && e.n !== ex.n);
-
+  const sameMuscle = exercises.filter(e => e.m === ex.m && e.id !== ex.id);
   const myDiffIndex = DIFF_ORDER.indexOf(ex.d);
 
-  // Regressions: same muscle, lower difficulty — take up to 2
+  // Regressions: same muscle, lower difficulty — up to 2
   const regressions = sameMuscle
     .filter(e => DIFF_ORDER.indexOf(e.d) < myDiffIndex)
     .slice(0, 2);
 
-  // Progressions: same muscle, higher difficulty — take up to 2
+  // Progressions: same muscle, higher difficulty — up to 2
   const progressions = sameMuscle
     .filter(e => DIFF_ORDER.indexOf(e.d) > myDiffIndex)
     .slice(0, 2);
 
-  // Variations: exercises whose name shares the first word, different exercise
+  // Variations: name shares first word, different exercise — up to 3
   const firstWord = ex.n.split(' ')[0];
   const variations = exercises
-    .filter(e => e.id !== ex.id && e.n !== ex.n && e.n.includes(firstWord))
+    .filter(e => e.id !== ex.id && e.n.startsWith(firstWord))
     .slice(0, 3);
 
   return { regressions, progressions, variations };
@@ -39,8 +38,8 @@ function getExplorerNeighbors(ex) {
 
 function renderExplorer() {
   const ex = exercises.find(e => e.id === explorerActiveId);
+
   if (!ex) {
-    // No exercise selected — show a prompt in the center
     const canvas = document.getElementById('explorerCanvas');
     const cx = canvas.offsetWidth / 2;
     const cy = canvas.offsetHeight / 2;
@@ -54,38 +53,36 @@ function renderExplorer() {
 
   const { regressions, progressions, variations } = getExplorerNeighbors(ex);
 
-  // Build satellite list — only real exercises, labelled by type
+  // Build satellite list — ONLY include nodes that actually exist
   const allSats = [
     ...regressions.map(e => ({ ex: e, type: 'regression' })),
     ...progressions.map(e => ({ ex: e, type: 'progression' })),
     ...variations.map(e => ({ ex: e, type: 'variation' }))
-  ].filter(item => item.ex && item.ex.id); // Fix 2: skip any empty/missing entries
+  ].filter(item => item.ex && item.ex.id);  // skip any missing entries
 
   const canvas = document.getElementById('explorerCanvas');
   const cx = canvas.offsetWidth / 2;
   const cy = canvas.offsetHeight / 2;
 
-  // Fix 1: Clean orbital radius — spread nodes evenly in a ring
+  // TRUE circular layout — evenly spaced around a ring, starting from the top
   const nodeCount = allSats.length;
   const isMobile = canvas.offsetWidth < 500;
-  const baseRadius = isMobile ? 145 : 200;
-  // If there are many nodes, expand the ring so they don't overlap
-  const dynamicRadius = nodeCount > 0
-    ? Math.max(baseRadius, (nodeCount * 90) / (2 * Math.PI))
-    : baseRadius;
+  // Radius scales up if there are many nodes to prevent crowding
+  const radius = nodeCount > 0
+    ? Math.max(isMobile ? 145 : 190, (nodeCount * 95) / (2 * Math.PI))
+    : 190;
 
   const positions = allSats.map((item, i) => {
-    // Start from top (-π/2) and space evenly around the circle
-    const angle = (2 * Math.PI * i) / nodeCount - Math.PI / 2;
+    const angle = (2 * Math.PI * i) / nodeCount - Math.PI / 2; // start at top
     return {
       ex: item.ex,
       type: item.type,
-      x: cx + dynamicRadius * Math.cos(angle),
-      y: cy + dynamicRadius * Math.sin(angle)
+      x: cx + radius * Math.cos(angle),
+      y: cy + radius * Math.sin(angle)
     };
   });
 
-  // Draw connecting lines
+  // Draw SVG lines
   document.getElementById('explorerLines').innerHTML = positions.map(p =>
     `<line class="explorer-line ${p.type}" x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" />`
   ).join('');
@@ -98,12 +95,13 @@ function renderExplorer() {
       <div class="cn-diff diff-badge-${(ex.d||'').toLowerCase()}">${ex.d || ''}</div>
     </div>` +
     positions.map(p => `
-    <div class="explorer-node sat-node" style="left:${p.x}px;top:${p.y}px" onclick="navigateExplorer(${p.ex.id})">
-      <div class="sat-inner sat-${p.type}">
-        <div class="sat-type-label">${p.type}</div>
-        <div class="sat-name">${p.ex.n}</div>
-      </div>
-    </div>`).join('');
+      <div class="explorer-node sat-node" style="left:${p.x}px;top:${p.y}px" onclick="navigateExplorer(${p.ex.id})">
+        <div class="sat-inner sat-${p.type}">
+          <div class="sat-type-label">${p.type}</div>
+          <div class="sat-name">${p.ex.n}</div>
+        </div>
+      </div>`
+    ).join('');
 }
 
 function navigateExplorer(id) {
