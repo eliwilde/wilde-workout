@@ -276,3 +276,5 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
 .muscle-bar { width: 3px; height: 38px; border-radius: 2px; flex-shrink: 0; }
 .ex-info { flex: 1; min-width: 0; }
 .ex-name { font-size: 14px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
+/* EDIT MODE BAR */
+#editModeBar { display: none; }
