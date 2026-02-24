@@ -12,35 +12,42 @@
     <div id="installBanner"><div class="bt"><strong>Add to Home Screen</strong>...</div><button onclick="dismissBanner()">Got it</button></div>
     <button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
     <div class="toast" id="toast"></div>
-    <div id="editModeBar"><div class="em-label"><div class="em-dot"></div>EDIT MODE ACTIVE</div><button class="em-exit" onclick="exitEditMode()">✕ Exit</button></div>
+    <div id="editModeBar"></div>
     <header>
         <div class="header-top">
-            <div class="logo" id="logoBtn">Wilde<span>.</span></div>
-            <div class="search-wrap"><input type="search" id="searchInput" placeholder="Search exercises..."></div>
-            <button class="filter-toggle-btn" id="filterToggleBtn" onclick="toggleFilterDrawer()">Filters</button>
-            <button class="explorer-btn" id="explorerBtn" onclick="openExplorer()">Map</button>
+            <div class="logo">Wilde<span>.</span></div>
+            <div class="search-wrap">
+                <input type="search" id="searchInput" placeholder="Search exercises...">
+            </div>
+            <button class="header-btn" onclick="rollDice()" title="Random exercise">🎲</button>
+            <button class="header-btn has-filters-dot" id="favFilterBtn" onclick="toggleFavoritesFilter()" title="Favorites">♥</button>
+            <button class="header-btn" id="filterToggleBtn" onclick="toggleFilterDrawer()">Filters</button>
+            <button class="header-btn accent-btn" onclick="openExplorer()">Map</button>
         </div>
     </header>
     <div id="filterDrawer">
         <div class="filter-section">
-            <div class="filter-label">Muscle</div><div class="filter-row" id="muscleRow"></div>
+            <div class="filter-label">Muscle</div>
+            <div class="filter-row" id="muscleRow"></div>
             <div class="filter-label">Difficulty</div>
-            <div class="filter-row" id="diffRow">
-                <div class="pill active" onclick="setDiff('all',this)">All</div>
-                <div class="pill diff-novice" onclick="setDiff('Novice',this)">Novice</div>
-                <div class="pill diff-beginner" onclick="setDiff('Beginner',this)">Beginner</div>
-                <div class="pill diff-intermediate" onclick="setDiff('Intermediate',this)">Intermediate</div>
-                <div class="pill diff-advanced" onclick="setDiff('Advanced',this)">Advanced</div>
-            </div>
+            <div class="filter-row" id="diffRow"></div>
         </div>
     </div>
-    <div class="results-bar"><div class="results-count">Showing <strong id="countDisplay">0</strong> exercises</div></div>
-    <div id="listContainer"><div class="loading-state">Loading...</div></div>
-    <div id="pinModal"></div><div id="editPanel"></div><div id="explorerOverlay">
-        <div class="explorer-header"><button class="explorer-back-btn" onclick="closeExplorer()">Back</button><div class="explorer-title">Visual Map</div></div>
-        <div class="explorer-canvas" id="explorerCanvas"><svg class="explorer-lines" id="explorerLines"></svg><div id="explorerNodes"></div></div>
+    <div class="results-bar">
+        <div class="results-count">Showing <strong id="countDisplay">0</strong> exercises</div>
     </div>
-    <div id="wheelOverlay"></div><div id="sessionTray"></div>
+    <div id="listContainer"><div class="loading-state">Loading...</div></div>
+    <div id="explorerOverlay">
+        <div class="explorer-header">
+            <button class="explorer-back-btn" onclick="closeExplorer()">← Back</button>
+            <div class="explorer-title">Visual Map</div>
+        </div>
+        <div class="explorer-canvas" id="explorerCanvas">
+            <svg class="explorer-lines" id="explorerLines"></svg>
+            <div id="explorerNodes"></div>
+        </div>
+    </div>
+    <div id="sessionTray"></div>
     <script src="script.js"></script>
 </body>
 </html>
