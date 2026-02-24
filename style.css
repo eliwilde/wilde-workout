@@ -214,39 +214,4 @@ header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-b
 .ex-card:not(.expanded) .map-btn { display: none; }
 .chevron { display: none; }
 
-.map-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  transition: transform 0.15s, color 0.15s;
-  flex-shrink: 0;
-  color: var(--muted2);
-}
-.map-btn:hover { transform: scale(1.2); color: var(--accent); }
-.map-btn svg { width: 16px; height: 16px; }
-
-.heart-btn {
-  background: none; border: none; cursor: pointer; padding: 4px; border-radius: 6px;
-  display: flex; align-items: center; justify-content: center; transition: transform 0.15s; flex-shrink: 0;
-}
-.heart-btn svg { width: 20px; height: 20px; min-width: 18px; transition: all 0.2s; }
-.heart-btn.favorited svg { fill: var(--heart); stroke: var(--heart); filter: drop-shadow(0 0 4px rgba(255,77,109,0.5)); }
-.heart-btn:not(.favorited) svg { fill: none; stroke: var(--muted2); }
-@keyframes heartPop { 0% {transform:scale(1)} 40% {transform:scale(1.35)} 70% {transform:scale(0.9)} 100% {transform:scale(1)} }
-.heart-btn.pop { animation: heartPop 0.35s ease forwards; }
-
-.ex-detail { display: none; padding: 0 14px 14px; border-top: 1px solid var(--border); }
-.ex-card.expanded .ex-detail { display: block; }
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-.detail-item label { font-family: 'Space Mono', monospace; font-size: 9px; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 3px; }
-.detail-item p { font-size: 13px; font-weight: 600; color: var(--text); }
-.detail-item.full { grid-column: 1 / -1; }
-
-.video-btn { margin-top: 12px; display: flex; align-items: center; gap: 8px; background: #ff0000; color: white; padding: 10px 16px; border-radius: 8px; font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; cursor: pointer; border: none; width: 100%; justify-content: center; text-decoration: none; transition: background 0.15s; }
-.no-video { margin-top: 10px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
-
-.muscle-diagram-wrap { grid-column: 1 / -1; display: flex; gap: 0; align-items: flex-start; margin-top: 10px; padding: 12px 4px 10px; border-radius: 10px; background: #080808; border: 1px solid #1a1a1a; }
-.diagram-col { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1;
+/* VISUAL EXPLORER LINES - UPDATED TO STROKE-WIDTH 2 */
